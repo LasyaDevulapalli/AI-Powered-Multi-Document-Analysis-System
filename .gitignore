@@ -1,0 +1,65 @@
+﻿# Environment variables and secrets
+.env
+.env.*
+!.env.example
+backend/.env
+frontend/.env
+frontend/.env.*
+!frontend/.env.example
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+venv/
+venv_clean/
+.venv/
+
+# Node
+node_modules/
+dist/
+.next/
+
+# ChromaDB and generated databases
+vector_store/
+chroma_db/
+*.sqlite3
+*.db
+
+# Private document datasets and generated files
+data/documents/
+data/processed/
+uploads/
+
+# IDE and OS files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Prepared datasets and evaluation materials
+data/datasets/
+
+# External GATE study-material repository
+gate_notes_source/
+
+# Temporary OCR testing artifacts
+/ocr_test_page_*.png
+/ocr_test_page_*.txt
+/quality_page_*.png
+/quality_page_*.txt
+
+
+# Local debugging and backup scripts
+backend/inspect_*.py
+backend/vector_store_backup.py
+backend/test_gemini.py
+backend/create_sample_pdfs.py
+/test_ocr_sample.py
+/build_syllabus_matrix.py
+
