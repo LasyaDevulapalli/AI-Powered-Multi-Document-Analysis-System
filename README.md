@@ -1,279 +1,441 @@
-# AI-Powered Multi-Document Analysis System using LLMs, RAG & Knowledge Graphs (Phase 1)
+# AI-Powered Multi-Document Analysis System using LLMs, RAG & Knowledge Graphs
 
-> **Academic Project Title:** AI-Powered Multi-Document Analysis System using LLMs, RAG & Knowledge Graphs  
-> **Current Focus:** Phase 1 Implementation — Domain LLM & Vector RAG Infrastructure  
-> **Target Audience / Guide:** Academic Faculty Review Board  
+> **Academic Project:** AI-Powered Multi-Document Analysis System using LLMs, RAG & Knowledge Graphs  
+> **Current Phase:** Phase 1 – Domain-Specific Retrieval-Augmented Generation  
+> **Initial Domain:** GATE Computer Science and Information Technology (CSE)  
+> **Project Status:** Working prototype under evaluation
 
 ---
 
 ## 1. Project Objective
 
-The primary objective of Phase 1 is to build a domain-specific multi-document Question-Answering (QA) system powered by Retrieval-Augmented Generation (RAG). 
+The objective of this project is to develop an AI-powered multi-document analysis system that enables users to ask questions and obtain context-based answers from a predefined collection of domain-specific documents.
 
-Unlike typical conversational AI interfaces where users are forced to upload PDF files repeatedly during every session, this system operates over a **pre-indexed, domain-specific document repository** prepared in advance by administrators. Users interact directly with the knowledge base, submitting natural language questions and receiving answers that are strictly grounded in retrieved source documents, complete with precise page-level citations.
+The system uses Retrieval-Augmented Generation (RAG) to retrieve relevant information from a prepared document repository and uses a Large Language Model (LLM) to generate answers based on the retrieved evidence.
 
----
+Unlike conventional document-question-answering applications that require users to upload PDFs repeatedly, this system operates on a predefined knowledge base that is prepared and indexed in advance.
+
+The initial implementation focuses on GATE CSE preparation, with the architecture designed to support expansion into other academic domains.
 
 ## 2. Problem Statement
 
-Standard Large Language Models (LLMs) suffer from three critical academic limitations when applied to specialized domains:
-1. **Hallucination:** LLMs often generate plausible but factually incorrect assertions when lacking exact knowledge.
-2. **Knowledge Cutoff & Lack of Provenance:** Standard models cannot cite exact page numbers or document sources for their statements.
-3. **Repetitive Upload Overhead:** Uploading massive PDF collections per user session is inefficient, bandwidth-heavy, and unscalable.
+Large collections of academic documents, examination papers, answer keys and subject materials make it difficult for students to locate and analyze relevant information efficiently.
 
-**Phase 1 Solution:** Pre-index domain documents into a persistent vector store (ChromaDB), combine semantic and BM25-style lexical retrieval with rank fusion, enforce strict evidence-only generation, and display actual document and page-level source references.
+Conventional LLM-based systems also present challenges:
 
----
+1. **Hallucination:** Generated responses may contain information that is not supported by the available source material.
+2. **Lack of Source Traceability:** Answers may not provide sufficiently precise references to their original documents.
+3. **Repeated Document Uploads:** Uploading large document collections for every user session is inefficient.
+4. **Multi-Document Analysis:** Identifying and combining relevant information across multiple documents can be challenging.
 
-## 3. Phase 1 Scope & Boundary
+**Proposed Solution:** Develop a domain-specific document analysis platform using a predefined document repository, hybrid retrieval, persistent vector storage and LLM-based answer generation with source references.
 
-### In Scope (Phase 1):
-* Pre-indexed domain document storage (`data/documents/`)
-* Automated text extraction & validation from PDF files
-* Page-aware text chunking with configurable `chunk_size` and `chunk_overlap`
-* Modular embedding generation (SentenceTransformers `all-MiniLM-L6-v2` / Google Gemini `text-embedding-004`)
-* Persistent vector database storage using ChromaDB
-* Hybrid semantic and BM25-style lexical retrieval with reciprocal-rank fusion, deduplication, and source metadata preservation
-* Grounded prompt generation requiring document-name and page citations for factual claims
-* Source citation mapping (Document Name, Page Number, Chunk ID, Relevance Score)
-* Professional academic web dashboard (React + Vite)
-* Standalone indexing CLI (`python -m app.index`) & REST API (`FastAPI`)
-* Automated backend test suite: 54 tests passed in the latest reported run. Live LLM integration testing remains environment-dependent.
+## 3. Phase 1 Scope and Boundaries
 
-### Out of Scope for Phase 1 (Prepared for Phase 2):
-* Knowledge Graph (KG) entity-relation extraction *(Phase 2)*
-* Graph database (Neo4j / NetworkX) integration *(Phase 2)*
-* Hybrid vector + graph retrieval *(Phase 2)*
-* Fine-tuning LLM weights from scratch *(Not required)*
+### In Scope – Phase 1
 
----
+- Predefined, administrator-prepared domain document repository.
+- PDF discovery, text extraction and document validation.
+- Page-aware text chunking with configurable chunk size and overlap.
+- Embedding generation using SentenceTransformers or supported external embedding providers.
+- Persistent vector storage using ChromaDB.
+- Hybrid retrieval combining semantic and keyword-based retrieval with Reciprocal Rank Fusion (RRF).
+- Query analysis and decomposition for supported compound questions.
+- Context-based LLM answer generation.
+- Answer validation and source citation checks.
+- Source metadata including document names and page references.
+- React-based academic web interface.
+- FastAPI backend and REST API endpoints.
+- Automated backend tests.
 
-## 4. System Architecture & Workflow
+### Out of Scope – Phase 1
 
+The following capabilities are planned for subsequent development:
+
+- Knowledge Graph entity and relationship extraction.
+- Graph database integration using technologies such as Neo4j or NetworkX.
+- Graph-based retrieval.
+- Combined vector and graph retrieval.
+- Advanced multi-hop reasoning using Knowledge Graphs.
+
+Knowledge Graph functionality is part of the proposed future development and is not claimed as an implemented Phase 1 feature.
+
+## 4. System Architecture and Workflow
+
+The Phase 1 workflow consists of the following stages:
+
+1. **Prepared Document Repository:** Administrators maintain the predefined domain-specific PDF collection.
+2. **Document Processing:** Documents are discovered, validated and processed.
+3. **Text Extraction and Chunking:** Extracted text is divided into manageable chunks while preserving page metadata.
+4. **Embedding Generation:** Text chunks are converted into vector representations.
+5. **Persistent Storage:** Embeddings and associated metadata are stored in ChromaDB.
+6. **Hybrid Retrieval:** Relevant passages are retrieved using semantic and keyword-based retrieval with rank fusion.
+7. **Query Processing:** Supported compound questions can be decomposed into focused retrieval queries.
+8. **LLM Generation:** Retrieved evidence is supplied to the configured LLM for context-based answer generation.
+9. **Answer Validation:** Available validation checks examine generated answers and their source references.
+10. **Response Presentation:** Answers and supporting source information are presented through the web interface.
+
+### Architecture Overview
+
+```text
+       Predefined Domain PDF Repository
+                    |
+                    v
+          Document Processing
+                    |
+                    v
+       Text Extraction and Chunking
+                    |
+                    v
+          Embedding Generation
+                    |
+                    v
+          Persistent ChromaDB
+                    |
+                    |
+             User Question
+                    |
+                    v
+          Query Analysis
+                    |
+                    v
+        Hybrid Retrieval + RRF
+                    |
+                    v
+         Retrieved Evidence
+                    |
+                    v
+          Grounded LLM Engine
+                    |
+                    v
+         Answer Validation
+                    |
+                    v
+       Answer + Source References
+                    |
+                    v
+          React Web Interface
 ```
-┌────────────────────────────────────────────────────────┐
-│             Predefined Domain Documents                │
-│                 (data/documents/*.pdf)                 │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│            Document Processing & Extraction            │
-│       (Readability validation & page text extraction)  │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│                  Text Chunking Unit                    │
-│   (Configurable Chunk Size: 600, Overlap: 100 chars)   │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│                 Embedding Generation                   │
-│        (Modular: SentenceTransformers / Gemini)        │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│           Persistent ChromaDB Vector Store             │
-│            (vector_store/ - Survives Restarts)         │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-       User Question ─────┤ (Natural Language Query)
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│          Hybrid Top-K Retrieval + Rank Fusion           │
-│     (Semantic, BM25-style lexical, source metadata)     │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│               Grounded LLM Prompt Engine               │
-│          (Strictly restricted to retrieved context)    │
-└──────────────────────────┬─────────────────────────────┘
-                           │
-                           ▼
-┌────────────────────────────────────────────────────────┐
-│            Grounded Answer + Page Citations            │
-│         (Document Name, Page Number, Relevance %)      │
-└────────────────────────────────────────────────────────┘
-```
-
----
 
 ## 5. Technology Stack
 
-* **Backend Framework:** Python 3.14, FastAPI, Uvicorn
-* **PDF Text Extraction:** `pypdf` (with empty/unreadable document detection)
-* **Text Chunking:** Recursive overlap chunker preserving page metadata
-* **Vector Database:** ChromaDB (persistent local store)
-* **Embedding Models:** SentenceTransformers (`all-MiniLM-L6-v2` - default local/zero-cost) or Google Gemini (`text-embedding-004`)
-* **LLM Engine:** Groq API (`llama-3.3-70b-versatile` / OpenAI-compatible endpoint) or Google Gemini API (`gemini-3.8-flash`) with fallback synthesis for offline evaluation
-* **Frontend UI:** React 19, Vite, Vanilla CSS Academic Design System
-* **Testing:** Pytest, FastAPI TestClient
+| Component | Technology |
+|---|---|
+| Programming Language | Python |
+| Backend Framework | FastAPI |
+| ASGI Server | Uvicorn |
+| Frontend | React 19 |
+| Frontend Build Tool | Vite |
+| Styling | CSS |
+| Vector Database | ChromaDB |
+| Embedding Model | SentenceTransformers (`all-MiniLM-L6-v2`) |
+| Additional Embedding Providers | Supported Gemini and OpenAI configurations |
+| LLM Providers | Groq and Google Gemini configurations |
+| Retrieval | Semantic and keyword-based hybrid retrieval |
+| Rank Fusion | Reciprocal Rank Fusion |
+| Testing | Pytest and FastAPI TestClient |
 
----
+Provider availability and model configuration depend on the corresponding environment variables and API credentials.
 
-## 6. Directory Structure
+## 6. Main Application Features
 
-```
+### 6.1 Ask Questions
+
+Allows users to submit natural-language questions against the prepared domain knowledge base.
+
+The system retrieves relevant passages and attempts to generate answers using the available evidence.
+
+### 6.2 Multi-Document Analysis
+
+Provides an interface for questions that require information from multiple documents.
+
+The system retrieves relevant evidence and attempts to synthesize information across the retrieved sources. The quality and completeness of multi-document synthesis remain under evaluation.
+
+### 6.3 Knowledge Base Management
+
+Displays the current knowledge-base status and available indexing information.
+
+The underlying repository is prepared and indexed in advance rather than requiring repeated student uploads.
+
+### 6.4 Source References
+
+Displays available source information associated with retrieved evidence, including document names and page references.
+
+Citation accuracy and direct navigation to the corresponding original PDF pages remain areas for further validation.
+
+### 6.5 Document Library
+
+Provides a document-library interface for accessing prepared PDF resources.
+
+The library loading functionality has an outstanding issue identified during Phase 1 evaluation and requires further testing and correction.
+
+## 7. Project Directory Structure
+
+```text
 multi_doc_rag_system/
-├── backend/
-│   ├── app/
-│   │   ├── api/
-│   │   │   ├── routes.py            # FastAPI endpoints (/health, /api/query, /api/index, /api/status)
-│   │   │   └── schemas.py           # Pydantic validation schemas
-│   │   ├── core/
-│   │   │   ├── config.py            # Pydantic BaseSettings (Chunk size, paths, models)
-│   │   │   └── logging_config.py    # Structured logging setup
-│   │   ├── document_processing/
-│   │   │   ├── base.py              # Base document extractor & data models
-│   │   │   ├── pdf_extractor.py     # PDF text extraction & validation
-│   │   │   └── processor.py         # Directory discovery & extraction manager
-│   │   ├── rag/
-│   │   │   ├── chunker.py           # Text chunker with page metadata preservation
-│   │   │   ├── embeddings.py        # Modular embedding service (SentenceTransformers / Gemini)
-│   │   │   ├── vector_store.py      # ChromaDB persistence & similarity search
-│   │   │   ├── llm_service.py       # Grounded LLM service (Groq / Gemini / Mock)
-│   │   │   └── pipeline.py          # RAG pipeline orchestrator
-│   │   ├── main.py                  # FastAPI application entrypoint
-│   │   └── index.py                 # Standalone CLI indexing script
-│   ├── tests/
-│   │   ├── test_extractor.py        # Extractor unit tests
-│   │   ├── test_chunker.py          # Chunker unit tests
-│   │   ├── test_vector_store.py     # Vector store unit tests
-│   │   └── test_api.py              # API integration tests
-│   ├── conftest.py                  # Pytest configuration
-│   └── requirements.txt             # Backend dependencies
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   │   ├── Header.jsx           # Academic header with status badge
-│   │   │   ├── KBStatusPanel.jsx    # Pre-indexed document list display
-│   │   │   ├── QueryPanel.jsx       # Natural language input & sample questions
-│   │   │   ├── AnswerDisplay.jsx    # Grounded answer & performance metrics
-│   │   │   ├── SourcesList.jsx      # Source citation cards with page & score
-│   │   │   └── ErrorAlert.jsx       # User-facing error component
-│   │   ├── services/
-│   │   │   └── api.js               # Axios API client
-│   │   ├── App.jsx                  # Main dashboard layout
-│   │   ├── index.css                # Academic Vanilla CSS design system
-│   │   └── main.jsx
-│   ├── package.json
-│   └── vite.config.js
-├── data/
-│   └── documents/                   # Predefined domain PDF documents
-├── vector_store/                    # Persistent ChromaDB collection directory
-├── .env.example                     # Environment template
-└── README.md                        # Academic documentation
+|
+|-- backend/
+|   |-- app/
+|   |   |-- api/
+|   |   |   |-- routes.py
+|   |   |   |-- schemas.py
+|   |   |
+|   |   |-- core/
+|   |   |   |-- config.py
+|   |   |   |-- logging_config.py
+|   |   |
+|   |   |-- document_processing/
+|   |   |   |-- __init__.py
+|   |   |   |-- base.py
+|   |   |   |-- library.py
+|   |   |   |-- pdf_extractor.py
+|   |   |   |-- processor.py
+|   |   |
+|   |   |-- image_processing/
+|   |   |   |-- __init__.py
+|   |   |   |-- image_service.py
+|   |   |
+|   |   |-- rag/
+|   |   |   |-- __init__.py
+|   |   |   |-- answer_validation.py
+|   |   |   |-- chunker.py
+|   |   |   |-- embeddings.py
+|   |   |   |-- llm_service.py
+|   |   |   |-- pipeline.py
+|   |   |   |-- query_analysis.py
+|   |   |   |-- vector_store.py
+|   |   |
+|   |   |-- index.py
+|   |   |-- main.py
+|   |
+|   |-- tests/
+|   |-- conftest.py
+|   |-- requirements.txt
+|
+|-- frontend/
+|   |-- public/
+|   |-- src/
+|   |   |-- assets/
+|   |   |-- components/
+|   |   |-- services/
+|   |   |-- views/
+|   |   |-- App.css
+|   |   |-- App.jsx
+|   |   |-- index.css
+|   |   |-- main.jsx
+|   |
+|   |-- index.html
+|   |-- package.json
+|   |-- package-lock.json
+|   |-- vite.config.js
+|
+|-- .env.example
+|-- .gitignore
+|-- README.md
 ```
 
----
+**Note:** Prepared PDF datasets, external study-material repositories, local environment files and the persistent ChromaDB database are maintained separately and are not included in this public source-code repository.
 
-## 7. Installation & Setup Instructions
+## 8. Installation and Setup
 
 ### Prerequisites
-* Python 3.10+ (Tested on Python 3.14)
-* Node.js 18+ and npm
 
-### Step 1: Backend Setup
+- Python 3.10 or later.
+- Node.js 18 or later.
+- npm.
+- Git.
+- An API key for the selected LLM provider, if using an external LLM.
+
+### Step 1: Clone the Repository
+
 ```bash
-# Navigate to backend directory
+git clone https://github.com/LasyaDevulapalli/AI-Powered-Multi-Document-Analysis-System.git
+
+cd AI-Powered-Multi-Document-Analysis-System
+```
+
+### Step 2: Backend Setup
+
+```bash
 cd backend
 
-# Create virtual environment
 python -m venv venv
+```
 
-# Activate virtual environment
-# Windows PowerShell:
+Activate the environment.
+
+**Windows PowerShell:**
+
+```powershell
 .\venv\Scripts\Activate.ps1
-# Linux/macOS:
-source venv/bin/activate
+```
 
-# Install dependencies
+**Linux/macOS:**
+
+```bash
+source venv/bin/activate
+```
+
+Install dependencies:
+
+```bash
 pip install -r requirements.txt
 ```
 
-### Step 2: Configure Environment Variables
-Create `backend/.env` for backend-only configuration. Keep provider API keys out of frontend files and client-side environment variables. Add the following settings to `backend/.env`:
+### Step 3: Configure Environment Variables
+
+Create a `backend/.env` file.
+
+Configure the required provider credentials and settings. For example:
+
 ```env
 GROQ_API_KEY=your_groq_api_key_here
+
 LLM_PROVIDER=groq
 GROQ_MODEL_NAME=llama-3.3-70b-versatile
+
 EMBEDDING_PROVIDER=sentence-transformers
 EMBEDDING_MODEL_NAME=all-MiniLM-L6-v2
+
 CHUNK_SIZE=600
 CHUNK_OVERLAP=100
 TOP_K=4
+
 CHROMA_COLLECTION_NAME=domain_knowledge_base
 ```
 
-### Step 3: Index Domain Documents (CLI)
-Before launching the server, process and index the prepared domain documents.
-The indexer reads PDFs from `data/documents/` and recursively from
-`data/datasets/gate_cse_phase1/subject_materials/`. Subject-material PDFs are
-added only when extracted text has at least 500 characters and an alphabetic
-character ratio of at least 0.35; rejected files are reported rather than
-indexed as evidence.
+Use the actual configuration options supported by the backend. Keep all API keys in the backend environment only. Never commit `.env` files.
+
+### Step 4: Prepare the Domain Document Repository
+
+The public GitHub repository does not include the prepared GATE CSE document collection.
+
+The administrator must separately obtain and prepare the permitted domain documents and place them in the expected local directories:
+
+```text
+data/
+    documents/
+    datasets/
+        gate_cse_phase1/
+            subject_materials/
+```
+
+The application is designed to use this prepared repository rather than requiring students to upload documents for every question.
+
+### Step 5: Index the Prepared Documents
+
+From the backend directory, run:
+
 ```bash
 python -m app.index
 ```
-Existing chunk IDs are preserved and skipped during indexing. The command
-reports discovered, extracted, skipped, and indexed counts, along with subject
-folders represented in the extracted corpus. `--force` intentionally refuses
-to clear or replace the active ChromaDB collection. For a rebuild, back up
-`vector_store/`, set `CHROMA_COLLECTION_NAME` to a new collection name in
-`backend/.env`, and index into that separate collection.
 
-### Step 4: Run Backend Server
+The indexing process discovers and processes the configured PDF sources and stores the resulting embeddings and metadata in the persistent ChromaDB collection.
+
+Existing indexed data should be backed up before performing any rebuild or collection changes.
+
+### Step 6: Start the Backend
+
 ```bash
 python -m uvicorn app.main:app --host 127.0.0.1 --port 8000
 ```
-Verify backend health by opening `http://127.0.0.1:8000/health`.
 
-### Step 5: Frontend Setup & Run
-Open a new terminal window:
+Backend health endpoint:
+
+```text
+http://127.0.0.1:8000/health
+```
+
+API documentation:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### Step 7: Start the Frontend
+
+Open another terminal:
+
 ```bash
-# Navigate to frontend directory
 cd frontend
 
-# Install Node dependencies
 npm install
 
-# Start Vite dev server
 npm run dev
 ```
-Access the academic web application at `http://127.0.0.1:5173/`.
 
----
+Open the application:
 
-## 8. Automated Testing
-
-Run the comprehensive pytest suite covering text extraction, chunking, ChromaDB vector search, API health, query validation, and no-result handling:
-```bash
-cd backend
-venv\Scripts\pytest.exe -v
+```text
+http://localhost:5173/
 ```
-Report the results from the test run performed in the current environment; no coverage or accuracy level is assumed here.
+
+## 9. Testing and Evaluation
+
+The backend includes automated tests covering areas such as:
+
+- Document extraction and processing.
+- Text chunking.
+- Vector-store functionality.
+- Query analysis.
+- Answer validation.
+- Retrieval pipeline behaviour.
+- API functionality.
+- LLM service behaviour.
+
+**Latest reported automated test result:** 54 backend tests passed.
+
+This result refers to the automated backend test suite, not 54 successful real-world question-answering evaluations.
+
+Live LLM integration testing remains environment-dependent. End-to-end answer correctness, retrieval relevance, citation reliability and multi-document synthesis continue to require evaluation.
+
+## 10. Current Implementation Status and Limitations
+
+Phase 1 has established the core application architecture and a working prototype.
+
+The local development environment previously reported:
+
+- 78 indexed documents.
+- 15,873 indexed chunks.
+- Persistent ChromaDB storage.
+- Working backend and frontend services.
+
+These figures describe the local development knowledge base and are not included in the public GitHub repository. They are not automatically reproduced when another developer clones the source code.
+
+Current areas requiring further improvement include:
+
+1. Retrieval relevance for certain technical and numerical questions.
+2. Completeness and accuracy of generated answers.
+3. Consistency of source citation validation.
+4. Evidence coverage in multi-document synthesis.
+5. Document Library loading functionality.
+6. Direct navigation from source references to the corresponding PDF pages.
+
+The system may return a no-direct-match response when sufficient supporting evidence is not found or validated. This behaviour and the underlying retrieval quality remain under evaluation.
+
+## 11. Phase 2: Future Enhancements
+
+Phase 2 is intended to extend the existing vector-based RAG architecture with Knowledge Graph capabilities.
+
+Planned enhancements include:
+
+- Entity and relationship extraction from indexed documents.
+- Knowledge Graph construction.
+- Graph database integration.
+- Graph-based retrieval.
+- Combined vector and graph retrieval.
+- Multi-hop reasoning across related documents.
+- Comparative evaluation of vector-only RAG and Graph-RAG approaches.
+
+These enhancements are planned developments and are not part of the current Phase 1 implementation.
 
 ---
 
-## 9. Example Research Questions
+## 12. Project Repository
 
-Try asking the following pre-loaded domain questions in the UI:
-1. *"What is Retrieval-Augmented Generation (RAG) and why is it used?"*
-2. *"What chunk size and overlap parameters yield optimal retrieval precision?"*
-3. *"Why does pure vector search fail for complex cross-document entity relations?"*
-4. *"How are LLM hallucinations prevented in this domain system?"*
+**GitHub:**  
+https://github.com/LasyaDevulapalli/AI-Powered-Multi-Document-Analysis-System
 
 ---
 
-## 10. Phase 2 Compatibility & Future Work
-
-Phase 1 provides a clean, modular foundation for Phase 2 extensions:
-* **Knowledge Graph Construction:** Entity-relation extraction will automatically parse chunks into nodes and edges.
-* **Graph Retrieval:** Add graph traversal alongside the Phase 1 dense/lexical hybrid retriever.
-* **Cross-Document Reasoning:** Resolve multi-hop dependencies across document boundaries.
-* **Comparative Benchmark:** Evaluate accuracy, hallucination rate, and context recall between Vector-only RAG (Phase 1) vs. Graph-RAG (Phase 2).
+*This project is being developed as an academic implementation, with Phase 1 focused on building and evaluating a domain-specific multi-document RAG system for GATE CSE preparation.*
